@@ -260,19 +260,26 @@ The feedback control memory is central to MASOpt, as it supplies the prior that 
 
 \begin{figure}[t]
     \centering
-    \begin{minipage}[t]{0.49\textwidth}
+    \begin{minipage}[b]{0.285\textwidth}
         \centering
         \includegraphics[width=\linewidth]{figures/prompt_quality.pdf}
-        \captionsetup{width=0.94\textwidth}
-        \caption{Pairwise prompt preference on four datasets. Segments show MASOpt wins, ties, and baseline wins.}
+        \captionsetup{width=0.98\linewidth}
+        \caption{Pairwise prompt preference, with MASOpt wins, ties, and baseline wins.}
         \label{fig:prompt-quality}
     \end{minipage}\hfill
-    \begin{minipage}[t]{0.49\textwidth}
+    \begin{minipage}[b]{0.285\textwidth}
         \centering
         \includegraphics[width=\linewidth]{figures/architecture_adaptation.pdf}
-        \captionsetup{width=0.94\textwidth}
-        \caption{Adaptation to three alternative workflows. Gray bars show Initial and blue bars Full, and labels give the Initial score and the Full-minus-Initial gain in points.}
+        \captionsetup{width=0.98\linewidth}
+        \caption{Adaptation to three alternative workflows, with Initial in gray and Full in blue.}
         \label{fig:architecture-adaptation}
+    \end{minipage}\hfill
+    \begin{minipage}[b]{0.40\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/backbone_radar.pdf}
+        \captionsetup{width=0.98\linewidth}
+        \caption{Adaptation across six backbones, with each Initial score normalized to 100.}
+        \label{fig:backbone-radar}
     \end{minipage}
 \end{figure}
 
@@ -288,14 +295,6 @@ We then ask how far MASOpt depends on the workflow it repairs. Holding the backb
 
 \subsection{Generalizability across Backbone Models}
 \label{sec:backbone-adaptation}
-
-\begin{wrapfigure}{r}{0.46\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/backbone_radar.pdf}
-    \captionsetup{width=0.44\textwidth}
-    \caption{Adaptation across six backbones. Each Initial score is normalized to 100 and all panels share the same radial range.}
-    \label{fig:backbone-radar}
-\end{wrapfigure}
 
 We finally measure how the closed loop behaves under different backbones. We instantiate the identical controller on six models of different families and scales, and pair every run with its own initial workflow. As shown in Figure~\ref{fig:backbone-radar}, the paired comparison is non-negative on every model and benchmark. Notably, the single tie occurs where the initial workflow already solves the benchmark completely and leaves no failure to observe. The gate predicts this shape, since it accepts only an actuation that reduces the measured error, so a stronger backbone offers fewer opportunities to act. Overall, MASOpt transfers across model families without structural recalibration, while the size of its benefit follows how much observable failure the backbone leaves behind.
 
