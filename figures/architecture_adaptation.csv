@@ -1,0 +1,4 @@
+dataset,initial,full,reported_gain_pp
+HotpotQA,73.2481,75.3711,2.1231
+MBPP,71.8475,73.9003,2.0528
+MATH,58.4362,60.4938,2.0576

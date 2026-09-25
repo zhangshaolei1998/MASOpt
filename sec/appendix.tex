@@ -1,0 +1,70 @@
+% Additional experimental details will be included with the final benchmark results.
+
+
+\section{Experimental Details}
+\label{app:experimental-details}
+
+\subsection{Datasets and Splits}
+\label{app:data-splits}
+
+Table~\ref{tab:data-splits} lists the data pools and evaluation metrics. Following AFlow, the fixed MATH Level-5 test subset contains 155 Prealgebra, 124 Number Theory, 108 Precalculus, and 99 Counting \& Probability problems. Development-pool sizes describe the available data, rather than a shared optimization protocol for all historical configurations.
+
+\begin{table}[!htbp]
+    \centering
+    \setlength{\belowcaptionskip}{6pt}
+    \caption{Datasets, local splits, and evaluation metrics. HumanEval uses five registered development-fold configurations over 33 problems and a fixed 131-problem test set. All reported scores are on a 0--100 scale.}
+    \label{tab:data-splits}
+    \footnotesize
+    \setlength{\tabcolsep}{7pt}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}llrrl@{}}
+        \toprule
+        Task family & Benchmark & Development pool & Test size & Metric \\
+        \midrule
+        Code generation & HumanEval & 33 & 131 & pass@1 \\
+                        & MBPP & 86 & 341 & pass@1 \\
+        Mathematical reasoning & GSM8K & 264 & 1,055 & answer accuracy \\
+                               & MATH & 119 & 486 & answer accuracy \\
+        Reading comprehension & HotpotQA & 200 & 800 & token F1 \\
+                              & DROP & 200 & 800 & answer F1 \\
+        Interactive environments & ALFWorld & 33 training tasks & 140 seen / 134 unseen & task success rate \\
+                                 & TextCraft & 20 & 80 & task success rate \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
+\subsection{Implementation and Selection Protocols}
+\label{app:protocols}
+
+Table~\ref{tab:main-results} reproduces the means of eight literature baselines from \citet{hong2026maspob}; their reported standard deviations are omitted. The \emph{Original workflow} in within-system comparisons is the locally executed graph with its original role prompts. Our HiveMind result is an unofficial three-node transfer of a method originally developed for a seven-agent financial trading system: two independent analysis nodes feed an integrator, and exact DAG-Shapley contribution, cached identical inputs, lowest-contribution selection, and success/failure reflection are retained while task score replaces the original coalition reward. This local transfer uses a fixed 20-example development subset in four five-example update windows, whereas the selected historical MASOpt systems have a different model-selection history. We therefore do not present this implementation as an official reproduction or an equal-budget comparison.
+
+Unless stated otherwise, local main, component, and architecture experiments requested \texttt{gpt-4o-mini-2024-07-18} with temperature 0 and top-$p$ 1. The provider generally returned the \texttt{gpt-4o-mini} alias, so the underlying served snapshot was not independently verified. MASOpt never updates backbone parameters. Reference answers and benchmark scores are used for offline reward construction and evaluation, but are not exposed to the online acceptance rule.
+
+For experience construction, selection, and controller selection, respectively, the local development pools are split 140/30/30 for HotpotQA and DROP, 184/39/41 for GSM8K, 83/17/19 for MATH, and 60/12/14 for MBPP; HumanEval uses five registered folds. The imported MBPP workflow also uses additional public checks and experience drawn from the 86-problem development pool, so its comparison with the original workflow is not a controlled contrast in which both systems see only examples attached to the test problem. ALFWorld runs use a 35-step limit. The controlled TextCraft runs use 20 environment steps and at most two repair proposals. Each non-interactive HiveMind test item uses three node calls with at most 4,096 output tokens per call; interactive calls use at most 1,024 output tokens per node and the corresponding 35/20-step limits. Unless otherwise noted, each local score is computed from one complete set of task predictions rather than repeated random-seed runs.
+
+Some historical development and follow-up analyses used feedback from the same test set that is reported below. Regenerating predictions does not restore that set as an untouched holdout. We therefore use these experiments to characterize the implemented systems and mechanisms, not to claim unbiased estimates of generalization after model selection.
+
+\subsection{Interactive Evaluation Protocols}
+\label{app:interactive-protocols}
+
+On TextCraft, MIPRO, the simplified MASPOB adaptation, and MASOpt solve 10, 11, and 24 of 80 tasks, respectively. All three use the same recipe-ID/material-binding interface and native environment success condition. MIPRO performs ten trials of categorical TPE search over instructions and examples; MASPOB performs 36 UCB prompt-arm trials without its GNN; MASOpt adds targeted repair from public dependency and inventory constraints. The frozen MASOpt controller can still generate task-local repairs from public observations, but it does not update cross-task memory or select prompts using test accuracy. The complete tests use 699, 684, and 888 API calls, respectively. Across development, search, initial, and repaired runs, the archived TextCraft campaign records 4,923 physical calls and 13,114,187 known tokens; token counts for three retried network failures are unavailable.
+
+The ALFWorld labels for AFlow, MIPRO, and MASPOB denote seed-plus-static-memory archives whose four role prompts are identical, rather than executions of three distinct optimizers; their score differences must not be attributed to the named algorithms. The latest verified MASOpt rerun obtains 105/140 (75.00\%) on seen tasks and 113/134 (84.33\%) on unseen tasks, whereas Table~\ref{tab:interactive-results} retains the historical 75.00/89.55 configuration. All 274 rerun receipts agree with the native terminal \texttt{won} field, although action guards override 43.88\% and 50.46\% of seen and unseen actions. For context, A$^2$Flow \citep{zhao2025a2flow}, using DeepSeek-v3 and a different protocol, reports 25.0\%, 31.3\%, and 59.0\% on ALFWorld seen, ALFWorld unseen, and TextCraft. The model, interface, and interaction budgets differ, so this is not a like-for-like comparison.
+
+\subsection{Experience Ablation: Configuration Details}
+\label{app:experience-details}
+
+We compare the full controller with three ablations: removing experience from the Diagnose Agent, removing experience from the Verify Agent, and removing all learned experience and the experience-memory component from the three-agent controller. The last variant still invokes Diagnose, RepairExecute, and Verify and then calls the underlying task workflow; it is therefore not a three-call replacement for the complete system. Within each registered dataset configuration, all arms reuse the same Initial outputs. These are post-hoc exploratory runs and do not replace the main configurations in Table~\ref{tab:main-results}.
+
+
+
+Figure~\ref{fig:experience-ablation} shows that Full improves over its paired Initial by 0.5865 pp on MBPP, 0.6880 pp on HotpotQA, and 2.6749 pp on MATH. Among the displayed ablations, Full is higher than the strongest ablated arm by 0.2933, 0.1835, and 0.2058 pp, respectively. On MBPP, removing diagnostic experience causes the largest decrease relative to Full (1.4663 pp). On MATH, removing either diagnostic or verification experience changes one correct answer relative to Full. These effects are heterogeneous and small in several cells; they do not by themselves identify a stable causal contribution. The MBPP verification ablation also contains fallback behavior after selector-parsing failures, while the latest MATH controller includes deterministic arithmetic-candidate generation.
+
+The paired Initial is configuration-specific and is not always the untouched original prompt. In particular, HotpotQA uses the original \texttt{round\_1} output (73.4451), whereas an independently regenerated original baseline scores 73.9734 but has no matched Full run. MATH uses a \texttt{round\_1} graph with a finalization wrapper and scores 60.9053; an independent original-prompt baseline scores 62.3457 but likewise cannot replace the paired Initial. On the separately registered GSM8K controller, Initial and Full score 93.2701 and 93.6493: Full repairs seven examples and harms three, but its score equals the best ablation. A prior verifier version scored 92.6066 after repairing seven and harming fourteen examples. This history further motivates treating the study as exploratory.
+
+\subsection{Backbone Adaptation: Evidence and Protocol Differences}
+\label{app:backbone-protocols}
+
+Finally, we evaluate GPT-5.3-codex, GPT-5.4-mini, Gemini-3.6-flash, Grok-4.5, Qwen3-4B, and Qwen3.5-9B on all six non-interactive benchmarks. Each model uses its own recorded experience, prompts, output budget, recovery path, and terminal policy. The study therefore measures adaptation of complete model-specific systems rather than a single-factor backbone substitution.
+
+These evaluations also involve departures from a uniform protocol. Qwen3.5-9B on MATH uses host-side symbolic computation, and the source Grok-4.5 MATH recovery run uses four calls rather than the registered two-call budget. The added 18 cells on MBPP, GSM8K, and HotpotQA reuse valid historical predictions where available, recover missing outputs, and, for configurations that had not improved, apply terminal prompts or acceptance rules informed by observed errors. Those cells are post-hoc analyses on the original test denominators, not confirmatory results on an untouched test set. The uniformly non-negative pattern therefore documents the scope of the current model-specific implementations; it does not prove transfer under a common budget or isolate the causal effect of changing only the backbone.

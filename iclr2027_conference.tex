@@ -1,0 +1,70 @@
+
+\documentclass{article} % For LaTeX2e
+\usepackage[T1]{fontenc}
+\usepackage{iclr2027_conference,times}
+
+% Optional math commands from https://github.com/goodfeli/dlbook_notation.
+\input{math_commands.tex}
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{placeins}
+\usepackage{wrapfig}
+
+\input{sec/0_title}
+
+% Authors must not appear in the submitted version. They should be hidden
+% as long as the \iclrfinalcopy macro remains commented out below.
+% Non-anonymous submissions will be rejected without review.
+
+\author{Anonymous Authors}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+%\iclrfinalcopy % Uncomment for camera-ready version, but NOT for submission.
+\begin{document}
+
+
+\maketitle
+
+\begin{abstract}
+\input{sec/0_abstract}
+\end{abstract}
+
+\input{sec/01_intro}
+\input{sec/02_related_work}
+\input{sec/03_method}
+\input{sec/04_experiment}
+\input{sec/05_conclusion}
+
+\subsection*{AI use statement}
+
+Generative AI tools were used for language editing and LaTeX organization during manuscript preparation. The authors reviewed all AI-assisted text, verified the cited sources, and take responsibility for the final manuscript and its claims.
+
+\subsection*{Ethics statement}
+
+This work uses publicly available benchmarks and does not involve human subjects, private data, or interventions in real-world decision-making. The authors will document model access, evaluation procedures, and failure cases to support responsible use of online prompt adaptation.
+
+\subsection*{Reproducibility statement}
+
+The method is specified in Sections~\ref{sec:method} and the planned evaluation protocol is described in Section~\ref{sec:experiments}. The final version will release the prompt templates, calibration trajectories, evaluation scripts, and configuration files needed to reproduce the reported results, subject to the terms of the underlying model and benchmark licenses.
+
+\bibliography{iclr2027_conference}
+\bibliographystyle{iclr2027_conference}
+
+\appendix
+\input{sec/appendix}
+
+
+\end{document}

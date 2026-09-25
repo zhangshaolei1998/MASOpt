@@ -1,0 +1,58 @@
+\section{Related Work}
+\label{sec:related_work}
+
+\subsection{Automatic Prompt and Program Optimization}
+
+The strong sensitivity of LLMs to natural-language instructions has motivated a broad line of work on automated prompt optimization.
+Early approaches such as Automatic Prompt Engineer generate and select instruction candidates using task-level evaluation
+\citep{zhou2022ape,pryzant2023automatic}.
+OPRO casts optimization itself as a language modeling problem, where an LLM proposes new solutions conditioned on previously evaluated candidates
+\citep{yang2024opro}.
+PromptBreeder adopts an evolutionary perspective and jointly evolves task prompts and the mutation prompts used to modify them
+\citep{fernando2024promptbreeder}.
+Other approaches optimize more structured language-model programs.
+DSPy treats prompts and demonstrations as parameters of declarative LM pipelines and compiles them against task metrics
+\citep{khattab2024dspy},
+while TextGrad propagates textual feedback through compound AI systems in a manner analogous to automatic differentiation
+\citep{yuksekgonul2024textgrad,agrawal2025textgrad}.
+More recently, SkillOpt treats external agent skills as optimizable textual parameters while keeping the target model frozen
+\citep{yang2026skillopt}.
+
+These approaches establish that natural-language instructions can be optimized systematically without relying exclusively on manual prompt engineering. They also expose a recurring limitation: most optimization signals are collected at the level of complete trials, so the optimizer receives little information about when a prompt becomes harmful within a trajectory.
+However, most of them optimize prompts or textual parameters using an offline development process and subsequently deploy the selected configuration.
+MASOpt instead focuses on prompt adaptation \emph{during} the execution of a new multi-agent task.
+
+
+\subsection{System-Level Prompt Optimization for Multi-Agent Systems}
+
+Prompt optimization becomes more difficult in MAS because prompts interact through the workflow topology.
+Optimizing one agent in isolation may improve its local behavior while changing the information distribution received by downstream agents.
+Recent work has therefore moved from independent prompt optimization toward system-level coordination.
+MAPRO formulates multi-agent prompt optimization as maximum a posteriori inference and uses topology-aware downstream feedback to selectively refine agent prompts
+\citep{mapro2026}.
+MASPOB formulates fixed-topology MAS prompt optimization as a budget-constrained black-box optimization problem.
+It combines bandit exploration with a graph neural network surrogate and coordinate ascent to model topology-induced prompt interactions under a limited evaluation budget
+\citep{hong2026maspob}.
+MASPO instead evaluates prompts according to both local behavior and their contribution to downstream system success, and searches for coordinated prompt configurations across agents
+\citep{wang2026maspo}.
+
+These methods demonstrate the importance of optimizing MAS prompts as a coupled system rather than as independent components.
+Their optimization target, however, remains a prompt configuration selected before deployment.
+MASOpt addresses a complementary problem in which the prompt state itself remains adaptable after execution has begun.
+
+
+\subsection{Runtime Feedback and Online Adaptation for Language Agents}
+
+A related line of research studies how language models and agents can improve from feedback available at test or runtime.
+Self-Refine alternates between feedback generation and output refinement, showing that an LLM can iteratively improve its own generations without additional parameter training
+\citep{madaan2023selfrefine,pan2024critic}.
+Reflexion converts environmental or task feedback into verbal reflections and stores them in episodic memory to improve subsequent agent trials
+\citep{shinn2023reflexion,yao2023react}.
+Recent memory-based approaches further explore persistent runtime adaptation.
+For example, MemRL learns utilities over episodic memories from environmental feedback and uses them to improve future agent behavior while keeping the base model fixed
+\citep{zhang2026memrl}.
+These studies highlight the value of feedback, reflection, and non-parametric adaptation for language agents.
+
+MASOpt differs in both its optimization target and temporal scope.
+Rather than refining a single generated output or updating a persistent agent memory across tasks, MASOpt directly modifies the prompts of interacting agents inside the current MAS execution.
+The effect of each modification is explicitly verified through the subsequent system response, making online prompt adaptation itself a closed-loop optimization process.
